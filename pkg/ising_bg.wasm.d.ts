@@ -1,0 +1,36 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory;
+export function __wbg_spingrid_free(a: number): void;
+export function spingrid_new(a: number, b: number, c: number, d: number, e: number): number;
+export function spingrid_get_index(a: number, b: number, c: number): number;
+export function spingrid_get_height(a: number): number;
+export function spingrid_get_width(a: number): number;
+export function spingrid_get_field(a: number): number;
+export function spingrid_set_temp(a: number, b: number): void;
+export function spingrid_set_interaction(a: number, b: number): void;
+export function spingrid_set_field(a: number, b: number): void;
+export function spingrid_hamiltonian(a: number): number;
+export function spingrid_magnetization(a: number): number;
+export function spingrid_step(a: number): void;
+export function spingrid_many_steps(a: number, b: number): number;
+export function spingrid_randomize(a: number): void;
+export function spingrid_spins_ptr(a: number): number;
+export function spingrid_fliprows_ptr(a: number): number;
+export function spingrid_flipcols_ptr(a: number): number;
+export function __wbg_tuner_free(a: number): void;
+export function __wbg_get_tuner_mean_obs(a: number): number;
+export function __wbg_set_tuner_mean_obs(a: number, b: number): void;
+export function __wbg_get_tuner_mean_obs_sq(a: number): number;
+export function __wbg_set_tuner_mean_obs_sq(a: number, b: number): void;
+export function __wbg_get_tuner_mean_field(a: number): number;
+export function __wbg_set_tuner_mean_field(a: number, b: number): void;
+export function __wbg_get_tuner_var_mean_obs(a: number): number;
+export function __wbg_set_tuner_var_mean_obs(a: number, b: number): void;
+export function __wbg_get_tuner_var_mean_field(a: number): number;
+export function __wbg_set_tuner_var_mean_field(a: number, b: number): void;
+export function tuner_new(a: number, b: number, c: number, d: number, e: number, f: number): number;
+export function tuner_update(a: number, b: number, c: number): number;
+export function tuner_get_kappa(a: number): number;
+export function tuner_reset(a: number, b: number, c: number, d: number): void;
+export function __wbindgen_exn_store(a: number): void;
