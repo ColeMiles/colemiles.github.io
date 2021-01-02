@@ -40,8 +40,8 @@ load().then((mod) => {
 
     const UP_COLOR = hexToStr(UP_COLOR_INT);
     const DOWN_COLOR = hexToStr(DOWN_COLOR_INT);
-    const SIZE = 500;
-    const CELL_SIZE = 2;
+    var SIZE = 500;
+    var CELL_SIZE = 1;
 
     // The number of updates per measurement passed to the tuner
     const STEPS_PER_MEAS = 10000;
@@ -62,6 +62,11 @@ load().then((mod) => {
     const tune_button = document.getElementById("tune-button");
     const toggle_button = document.getElementById("toggle-button");
     const graph_toggle_button = document.getElementById("graph-toggle-button");
+    const target_m_input = document.getElementById("target-m-input");
+    const forgetful_c_input = document.getElementById("forgetful-c-input");
+    const kappa_min_input = document.getElementById("kappa-min-input");
+    const kappa_max_input = document.getElementById("kappa-max-input");
+    const sys_size_setter = document.getElementById("sys-size");
     const temp_slider = document.getElementById("temp-slider");
     const temp_slider_value = document.getElementById("temp-slider-value");
     const field_slider = document.getElementById("field-slider");
@@ -76,15 +81,15 @@ load().then((mod) => {
     temp_slider_value.textContent = "T = " + temp_slider.value;
     field_slider_value.textContent = "B = " + field_slider.value;
 
-    const kappa_min = 10.0 * SIZE * SIZE;
-    const kappa_max_pref = 1.0; 
-    const target_m = 0.5;
-    const forgetful_c = 0.5;
+    var kappa_min = kappa_min_input.value * SIZE * SIZE;
+    var kappa_max_pref = kappa_max_input.value; 
+    var target_m = target_m_input.value * SIZE * SIZE;
+    var forgetful_c = forgetful_c_input.value;
 
-    const grid = SpinGrid.new(SIZE, SIZE, -1.0, temp_slider.value, 0.0);
-    const tuner = Tuner.new(0.0, target_m, 1.0, forgetful_c, kappa_min, kappa_max_pref);
-    const height = grid.get_height();
-    const width = grid.get_width();
+    var grid = SpinGrid.new(SIZE, SIZE, -1.0, temp_slider.value, 0.0);
+    var height = grid.get_height();
+    var width = grid.get_width();
+    var tuner = Tuner.new(0.0, target_m, 1.0, forgetful_c, kappa_min, kappa_max_pref);
 
     const canvas_div = document.getElementById("ising-canvas-div");
     canvas_div.height = CELL_SIZE * height;
@@ -362,13 +367,20 @@ load().then((mod) => {
             mag_data.length = 0;
             field_data.length = 0;
             timesteps.length = 0;
-            tuner.reset(
+            target_m = target_m_input.value * SIZE * SIZE;
+            forgetful_c = forgetful_c_input.value;
+            kappa_min = kappa_min_input.value * SIZE * SIZE;
+            kappa_max_pref = kappa_max_input.value;
+            tuner = Tuner.new(
                 field_slider.value,
-                0.5 * (SIZE * SIZE),
-                1.0 / temp_slider.value
-            );
+                target_m,
+                1.0 / temp_slider.value,
+                forgetful_c,
+                kappa_min,
+                kappa_max_pref,
+            )
         } else {
-            tune_button.textContent = "Tune! (To m = 0.5)"
+            tune_button.textContent = "Tune!"
         }
     });
 
@@ -392,6 +404,17 @@ load().then((mod) => {
         } else {
             graph_toggle_button.textContent = "Enable Plots";
         }
+    });
+
+    sys_size_setter.addEventListener("change", event => {
+        SIZE = sys_size_setter.value;
+        CELL_SIZE = 500 / SIZE
+        grid = SpinGrid.new(SIZE, SIZE, -1.0, temp_slider.value, 0.0);
+        height = grid.get_height();
+        width = grid.get_width();
+        drawFullGrid();
+        kappa_min = 10.0 * SIZE * SIZE;
+        tuner = Tuner.new(0.0, target_m, 1.0, forgetful_c, kappa_min, kappa_max_pref);
     });
 
     temp_slider.addEventListener("input", event => {

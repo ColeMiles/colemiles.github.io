@@ -1,7 +1,7 @@
 .slider {
   -webkit-appearance: none;  /* Override default CSS styles */
   appearance: none;
-  width: 30%; /* Full-width */
+  width: 100%; /* Full-width */
   height: 20px; /* Specified height */
   background: #d3d3d3; /* Grey background */
   outline: none; /* Remove outline */
@@ -46,9 +46,27 @@ body {
   margin-top: 20px;
 }
 
-#slider-wrapper {
-  margin-top: 20px;
-  margin-bottom: 20px;
+#system-params-wrapper {
+  display: grid;
+  grid-template-columns: 0.5fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  column-gap: 30px;
+  justify-items: center;
+}
+
+#sys-size {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#temp-slider {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+#field-slider {
+  grid-column: 3;
+  grid-row: 1;
 }
 
 #graph-wrapper {
@@ -72,4 +90,49 @@ body {
 #kappa-chart-div {
   grid-column: 3;
   grid-row: 1;
+}
+
+#button-wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+#toggle-button {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#play-pause-button {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+#reset-button {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+#tune-button {
+  grid-column: 4;
+  grid-row: 1;
+}
+
+#tuner-params-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 0.5fr 1fr 0.5fr;
+  grid-template-rows: repeat(2, 1fr);
+  column-gap: 10px;
+  margin-top: 0px;
+}
+
+.note-list > li {
+  color: grey;
+  font-size: 10pt;
+}
+
+.monospace {
+  font-family: monospace;
 }
