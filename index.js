@@ -41,7 +41,7 @@ load().then((mod) => {
     const UP_COLOR = hexToStr(UP_COLOR_INT);
     const DOWN_COLOR = hexToStr(DOWN_COLOR_INT);
     const SIZE = 500;
-    const CELL_SIZE = 1;
+    const CELL_SIZE = 2;
 
     // The number of updates per measurement passed to the tuner
     const STEPS_PER_MEAS = 10000;
@@ -54,7 +54,7 @@ load().then((mod) => {
         return (row * SIZE) + col;
     }
     const getCanvasIndex = (row, col) => {
-        return 4 * CELL_SIZE * (row * SIZE + col);
+        return 4 * CELL_SIZE * (row * CELL_SIZE * SIZE + col);
     }
 
     const pause_button = document.getElementById("play-pause-button");
@@ -296,7 +296,7 @@ load().then((mod) => {
         var b = UP_COLOR_B + DOWN_COLOR_B - image.data[baseIdx+2];
         for (var i=0; i<CELL_SIZE; i++) {
             for (var j=0; j<CELL_SIZE; j++) {
-                var idx = getCanvasIndex(row+i, col+j);
+                var idx = baseIdx + 4 * (canvas.width * i + j)
                 image.data[idx] = r;
                 image.data[idx+1] = g;
                 image.data[idx+2] = b;
