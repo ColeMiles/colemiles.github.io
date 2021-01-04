@@ -366,6 +366,7 @@ load().then((mod) => {
             tune_button.textContent = "Stop Tuning";
             mag_data.length = 0;
             field_data.length = 0;
+            kappa_data.length = 0;
             timesteps.length = 0;
             target_m = target_m_input.value * SIZE * SIZE;
             forgetful_c = forgetful_c_input.value;
