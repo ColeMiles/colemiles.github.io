@@ -1,4 +1,4 @@
-import init, {SpinGrid, Tuner} from "./pkg/ising.js"
+import init, {SpinGrid, Tuner, OldTuner} from "./pkg/ising.js"
 // import { memory } from "./pkg/ising_bg.wasm"
 
 async function load() {
@@ -66,6 +66,7 @@ load().then((mod) => {
     const forgetful_c_input = document.getElementById("forgetful-c-input");
     const kappa_min_input = document.getElementById("kappa-min-input");
     const kappa_max_input = document.getElementById("kappa-max-input");
+    const tuner_alg_select = document.getElementById("tuner-alg-select");
     const sys_size_setter = document.getElementById("sys-size");
     const temp_slider = document.getElementById("temp-slider");
     const temp_slider_value = document.getElementById("temp-slider-value");
@@ -372,14 +373,27 @@ load().then((mod) => {
             forgetful_c = forgetful_c_input.value;
             kappa_min = kappa_min_input.value * SIZE * SIZE;
             kappa_max_pref = kappa_max_input.value;
-            tuner = Tuner.new(
-                field_slider.value,
-                target_m,
-                1.0 / temp_slider.value,
-                forgetful_c,
-                kappa_min,
-                kappa_max_pref,
-            )
+            if (tuner_alg_select.value == "instantaneous") {
+                tuner = Tuner.new(
+                    field_slider.value,
+                    target_m,
+                    1.0 / temp_slider.value,
+                    forgetful_c,
+                    kappa_min,
+                    kappa_max_pref,
+                );
+            } else if (tuner_alg_select.value == "running-mean") {
+                tuner = OldTuner.new(
+                    field_slider.value,
+                    target_m,
+                    1.0 / temp_slider.value,
+                    forgetful_c,
+                    kappa_min,
+                    kappa_max_pref,
+                );
+            } else {
+                console.log("Oops.");
+            }
         } else {
             tune_button.textContent = "Tune!"
         }
@@ -415,7 +429,27 @@ load().then((mod) => {
         width = grid.get_width();
         drawFullGrid();
         kappa_min = 10.0 * SIZE * SIZE;
-        tuner = Tuner.new(0.0, target_m, 1.0, forgetful_c, kappa_min, kappa_max_pref);
+        if (tuner_alg_select.value == "instantaneous") {
+            tuner = Tuner.new(
+                field_slider.value,
+                target_m,
+                1.0 / temp_slider.value,
+                forgetful_c,
+                kappa_min,
+                kappa_max_pref,
+            );
+        } else if (tuner_alg_select.value == "running-mean") {
+            tuner = OldTuner.new(
+                field_slider.value,
+                target_m,
+                1.0 / temp_slider.value,
+                forgetful_c,
+                kappa_min,
+                kappa_max_pref,
+            );
+        } else {
+            console.log("Oops.");
+        }
     });
 
     temp_slider.addEventListener("input", event => {
@@ -463,8 +497,8 @@ load().then((mod) => {
                 grid.set_field(new_field);
                 // Plot *intensive* kappa
                 var kappa = tuner.get_kappa() / (SIZE * SIZE);
-                var kappa_min_t = kappa_min / (SIZE * SIZE * Math.sqrt(kappa_data.length + 1));
-                var kappa_max = kappa_max_pref * Math.sqrt(tuner.var_obs) / (SIZE * SIZE * Math.sqrt(tuner.var_field));
+                var kappa_min_t = tuner.get_kappa_min() / (SIZE * SIZE);
+                var kappa_max = tuner.get_kappa_max() / (SIZE * SIZE);
                 var kappa_eff = Math.min(kappa, kappa_max);
                 kappa_eff = Math.max(kappa, kappa_min_t);
 

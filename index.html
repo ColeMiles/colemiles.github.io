@@ -48,6 +48,11 @@
       <label for="kappa-min-input">κ_min_pref</label>
       <input type="number" id="kappa-max-input" min="0.1" value="1.0" step="any"></input>
       <label for="kappa-max-input">κ_max_pref</label>
+      <select name="tuner-alg" id="tuner-alg-select">
+        <option value="running-mean">Old (Running Mean)</option>
+        <option value="instantaneous">New (Instantaneous)</option>
+      </select>
+      <label for="tuner-alg">Tuner Algorithm</label>
     </div>
     <ol class="note-list">
       <li>These will only go into effect once a new tuning run is started.</li>

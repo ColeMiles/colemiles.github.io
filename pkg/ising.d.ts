@@ -2,6 +2,65 @@
 /* eslint-disable */
 /**
 */
+export class OldTuner {
+  free(): void;
+/**
+* @param {number} init_field
+* @param {number} target_obs
+* @param {number} beta
+* @param {number} forgetful_c
+* @param {number} kappa_min
+* @param {number} kappa_max_pref
+* @returns {OldTuner}
+*/
+  static new(init_field: number, target_obs: number, beta: number, forgetful_c: number, kappa_min: number, kappa_max_pref: number): OldTuner;
+/**
+* @param {number} obs
+* @param {number} obs_sq
+* @returns {number}
+*/
+  update(obs: number, obs_sq: number): number;
+/**
+* @returns {number}
+*/
+  get_kappa(): number;
+/**
+* @returns {number}
+*/
+  get_kappa_min(): number;
+/**
+* @returns {number}
+*/
+  get_kappa_max(): number;
+/**
+* @param {number} init_field
+* @param {number} target_obs
+* @param {number} beta
+*/
+  reset(init_field: number, target_obs: number, beta: number): void;
+/**
+* @returns {number}
+*/
+  mean_field: number;
+/**
+* @returns {number}
+*/
+  mean_obs: number;
+/**
+* @returns {number}
+*/
+  mean_obs_sq: number;
+/**
+* @returns {number}
+*/
+  var_mean_field: number;
+/**
+* @returns {number}
+*/
+  var_mean_obs: number;
+}
+/**
+*/
 export class SpinGrid {
   free(): void;
 /**
@@ -102,6 +161,14 @@ export class Tuner {
 /**
 * @returns {number}
 */
+  get_kappa_min(): number;
+/**
+* @returns {number}
+*/
+  get_kappa_max(): number;
+/**
+* @returns {number}
+*/
   mean_field: number;
 /**
 * @returns {number}
@@ -143,19 +210,38 @@ export interface InitOutput {
   readonly spingrid_fliprows_ptr: (a: number) => number;
   readonly spingrid_flipcols_ptr: (a: number) => number;
   readonly __wbg_tuner_free: (a: number) => void;
-  readonly __wbg_get_tuner_mean_obs: (a: number) => number;
-  readonly __wbg_set_tuner_mean_obs: (a: number, b: number) => void;
-  readonly __wbg_get_tuner_mean_obs_sq: (a: number) => number;
-  readonly __wbg_set_tuner_mean_obs_sq: (a: number, b: number) => void;
-  readonly __wbg_get_tuner_mean_field: (a: number) => number;
-  readonly __wbg_set_tuner_mean_field: (a: number, b: number) => void;
   readonly __wbg_get_tuner_var_field: (a: number) => number;
   readonly __wbg_set_tuner_var_field: (a: number, b: number) => void;
-  readonly __wbg_get_tuner_var_obs: (a: number) => number;
-  readonly __wbg_set_tuner_var_obs: (a: number, b: number) => void;
   readonly tuner_new: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly tuner_update: (a: number, b: number, c: number) => number;
   readonly tuner_get_kappa: (a: number) => number;
+  readonly tuner_get_kappa_min: (a: number) => number;
+  readonly tuner_get_kappa_max: (a: number) => number;
+  readonly __wbg_oldtuner_free: (a: number) => void;
+  readonly __wbg_get_oldtuner_mean_obs: (a: number) => number;
+  readonly __wbg_set_oldtuner_mean_obs: (a: number, b: number) => void;
+  readonly __wbg_get_oldtuner_mean_obs_sq: (a: number) => number;
+  readonly __wbg_set_oldtuner_mean_obs_sq: (a: number, b: number) => void;
+  readonly __wbg_get_oldtuner_mean_field: (a: number) => number;
+  readonly __wbg_set_oldtuner_mean_field: (a: number, b: number) => void;
+  readonly __wbg_get_oldtuner_var_mean_obs: (a: number) => number;
+  readonly __wbg_set_oldtuner_var_mean_obs: (a: number, b: number) => void;
+  readonly __wbg_get_oldtuner_var_mean_field: (a: number) => number;
+  readonly __wbg_set_oldtuner_var_mean_field: (a: number, b: number) => void;
+  readonly oldtuner_new: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
+  readonly oldtuner_update: (a: number, b: number, c: number) => number;
+  readonly oldtuner_get_kappa: (a: number) => number;
+  readonly oldtuner_get_kappa_min: (a: number) => number;
+  readonly oldtuner_get_kappa_max: (a: number) => number;
+  readonly oldtuner_reset: (a: number, b: number, c: number, d: number) => void;
+  readonly __wbg_set_tuner_mean_obs: (a: number, b: number) => void;
+  readonly __wbg_set_tuner_mean_obs_sq: (a: number, b: number) => void;
+  readonly __wbg_set_tuner_mean_field: (a: number, b: number) => void;
+  readonly __wbg_set_tuner_var_obs: (a: number, b: number) => void;
+  readonly __wbg_get_tuner_mean_obs: (a: number) => number;
+  readonly __wbg_get_tuner_mean_obs_sq: (a: number) => number;
+  readonly __wbg_get_tuner_mean_field: (a: number) => number;
+  readonly __wbg_get_tuner_var_obs: (a: number) => number;
   readonly __wbindgen_exn_store: (a: number) => void;
 }
 
