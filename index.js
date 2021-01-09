@@ -464,7 +464,7 @@ load().then((mod) => {
                 // Plot *intensive* kappa
                 var kappa = tuner.get_kappa() / (SIZE * SIZE);
                 var kappa_min_t = kappa_min / (SIZE * SIZE * Math.sqrt(kappa_data.length + 1));
-                var kappa_max = kappa_max_pref * Math.sqrt(tuner.var_mean_obs) / (SIZE * SIZE * Math.sqrt(tuner.var_mean_field));
+                var kappa_max = kappa_max_pref * Math.sqrt(tuner.var_obs) / (SIZE * SIZE * Math.sqrt(tuner.var_field));
                 var kappa_eff = Math.min(kappa, kappa_max);
                 kappa_eff = Math.max(kappa, kappa_min_t);
 

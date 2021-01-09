@@ -250,28 +250,28 @@ export class Tuner {
     /**
     * @returns {number}
     */
-    get var_mean_obs() {
-        var ret = wasm.__wbg_get_tuner_var_mean_obs(this.ptr);
+    get var_field() {
+        var ret = wasm.__wbg_get_tuner_var_field(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
-    set var_mean_obs(arg0) {
-        wasm.__wbg_set_tuner_var_mean_obs(this.ptr, arg0);
+    set var_field(arg0) {
+        wasm.__wbg_set_tuner_var_field(this.ptr, arg0);
     }
     /**
     * @returns {number}
     */
-    get var_mean_field() {
-        var ret = wasm.__wbg_get_tuner_var_mean_field(this.ptr);
+    get var_obs() {
+        var ret = wasm.__wbg_get_tuner_var_obs(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
-    set var_mean_field(arg0) {
-        wasm.__wbg_set_tuner_var_mean_field(this.ptr, arg0);
+    set var_obs(arg0) {
+        wasm.__wbg_set_tuner_var_obs(this.ptr, arg0);
     }
     /**
     * @param {number} init_field
@@ -301,14 +301,6 @@ export class Tuner {
     get_kappa() {
         var ret = wasm.tuner_get_kappa(this.ptr);
         return ret;
-    }
-    /**
-    * @param {number} init_field
-    * @param {number} target_obs
-    * @param {number} beta
-    */
-    reset(init_field, target_obs, beta) {
-        wasm.tuner_reset(this.ptr, init_field, target_obs, beta);
     }
 }
 

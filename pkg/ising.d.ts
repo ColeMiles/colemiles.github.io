@@ -100,12 +100,6 @@ export class Tuner {
 */
   get_kappa(): number;
 /**
-* @param {number} init_field
-* @param {number} target_obs
-* @param {number} beta
-*/
-  reset(init_field: number, target_obs: number, beta: number): void;
-/**
 * @returns {number}
 */
   mean_field: number;
@@ -120,11 +114,11 @@ export class Tuner {
 /**
 * @returns {number}
 */
-  var_mean_field: number;
+  var_field: number;
 /**
 * @returns {number}
 */
-  var_mean_obs: number;
+  var_obs: number;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -155,14 +149,13 @@ export interface InitOutput {
   readonly __wbg_set_tuner_mean_obs_sq: (a: number, b: number) => void;
   readonly __wbg_get_tuner_mean_field: (a: number) => number;
   readonly __wbg_set_tuner_mean_field: (a: number, b: number) => void;
-  readonly __wbg_get_tuner_var_mean_obs: (a: number) => number;
-  readonly __wbg_set_tuner_var_mean_obs: (a: number, b: number) => void;
-  readonly __wbg_get_tuner_var_mean_field: (a: number) => number;
-  readonly __wbg_set_tuner_var_mean_field: (a: number, b: number) => void;
+  readonly __wbg_get_tuner_var_field: (a: number) => number;
+  readonly __wbg_set_tuner_var_field: (a: number, b: number) => void;
+  readonly __wbg_get_tuner_var_obs: (a: number) => number;
+  readonly __wbg_set_tuner_var_obs: (a: number, b: number) => void;
   readonly tuner_new: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
   readonly tuner_update: (a: number, b: number, c: number) => number;
   readonly tuner_get_kappa: (a: number) => number;
-  readonly tuner_reset: (a: number, b: number, c: number, d: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
 }
 
