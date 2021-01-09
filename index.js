@@ -500,7 +500,7 @@ load().then((mod) => {
                 var kappa_min_t = tuner.get_kappa_min() / (SIZE * SIZE);
                 var kappa_max = tuner.get_kappa_max() / (SIZE * SIZE);
                 var kappa_eff = Math.min(kappa, kappa_max);
-                kappa_eff = Math.max(kappa, kappa_min_t);
+                kappa_eff = Math.max(kappa_eff, kappa_min_t);
 
                 kappa_data.push(kappa_eff);
                 var mean_mag = tuner.mean_obs / (SIZE * SIZE);
