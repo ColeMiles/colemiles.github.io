@@ -32,14 +32,27 @@
 
 body {
     position: absolute;
-    top: 0;
+    top: 50px;
     left: 0;
     width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    min-height: 100%;
+}
+
+p {
+  margin-top: 2em;
+  margin-bottom: 2em;
+  text-indent: 1em;
+  justify-content: left;
+}
+
+#explanation-div {
+  /*top: 0;*/
+  margin-left: 15%;
+  margin-right: 15%;
 }
 
 #ising-canvas-div {
@@ -126,7 +139,7 @@ body {
 
 #tuner-params-wrapper {
   display: grid;
-  grid-template-columns: 1fr 0.5fr 1fr 0.5fr;
+  grid-template-columns: 1fr 0.5fr 1fr 1fr;
   grid-template-rows: repeat(3, 1fr);
   column-gap: 10px;
   margin-top: 0px;

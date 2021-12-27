@@ -1,4 +1,4 @@
-import init, {SpinGrid, Tuner, OldTuner} from "./pkg/ising.js"
+import init, {SpinGrid, Tuner} from "./pkg/ising.js"
 // import { memory } from "./pkg/ising_bg.wasm"
 
 async function load() {
@@ -65,8 +65,6 @@ load().then((mod) => {
     const target_m_input = document.getElementById("target-m-input");
     const forgetful_c_input = document.getElementById("forgetful-c-input");
     const kappa_min_input = document.getElementById("kappa-min-input");
-    const kappa_max_input = document.getElementById("kappa-max-input");
-    const tuner_alg_select = document.getElementById("tuner-alg-select");
     const sys_size_setter = document.getElementById("sys-size");
     const temp_slider = document.getElementById("temp-slider");
     const temp_slider_value = document.getElementById("temp-slider-value");
@@ -83,7 +81,7 @@ load().then((mod) => {
     field_slider_value.textContent = "B = " + field_slider.value;
 
     var kappa_min = kappa_min_input.value * SIZE * SIZE;
-    var kappa_max_pref = kappa_max_input.value; 
+    var kappa_max_pref = 1.0; 
     var target_m = target_m_input.value * SIZE * SIZE;
     var forgetful_c = forgetful_c_input.value;
 
@@ -230,20 +228,6 @@ load().then((mod) => {
             borderColor: "#48e283",
             pointRadius: 0.0,
             fill: false
-          // },{
-          //   data: kappa_min_data,
-          //   label: "Kappa_min",
-          //   borderColor: "#58efde",
-          //   borderDash: [5, 5],
-          //   pointRadius: 0.0,
-          //   fill: false
-          // }, {
-          //   data: kappa_max_data,
-          //   label: "Kappa_max",
-          //   borderColor: "#41af33",
-          //   borderDash: [5, 5],
-          //   pointRadius: 0.0,
-          //   fill: false
           }],
       },
       options: {
@@ -372,28 +356,16 @@ load().then((mod) => {
             target_m = target_m_input.value * SIZE * SIZE;
             forgetful_c = forgetful_c_input.value;
             kappa_min = kappa_min_input.value * SIZE * SIZE;
-            kappa_max_pref = kappa_max_input.value;
-            if (tuner_alg_select.value == "instantaneous") {
-                tuner = Tuner.new(
-                    field_slider.value,
-                    target_m,
-                    1.0 / temp_slider.value,
-                    forgetful_c,
-                    kappa_min,
-                    kappa_max_pref,
-                );
-            } else if (tuner_alg_select.value == "running-mean") {
-                tuner = OldTuner.new(
-                    field_slider.value,
-                    target_m,
-                    1.0 / temp_slider.value,
-                    forgetful_c,
-                    kappa_min,
-                    kappa_max_pref,
-                );
-            } else {
-                console.log("Oops.");
-            }
+            kappa_max_pref = 1.0;
+            tuner = Tuner.new(
+                field_slider.value,
+                target_m,
+                1.0 / temp_slider.value,
+                forgetful_c,
+                kappa_min,
+                kappa_max_pref,
+            );
+            
         } else {
             tune_button.textContent = "Tune!"
         }
@@ -428,28 +400,16 @@ load().then((mod) => {
         height = grid.get_height();
         width = grid.get_width();
         drawFullGrid();
-        kappa_min = 10.0 * SIZE * SIZE;
-        if (tuner_alg_select.value == "instantaneous") {
-            tuner = Tuner.new(
-                field_slider.value,
-                target_m,
-                1.0 / temp_slider.value,
-                forgetful_c,
-                kappa_min,
-                kappa_max_pref,
-            );
-        } else if (tuner_alg_select.value == "running-mean") {
-            tuner = OldTuner.new(
-                field_slider.value,
-                target_m,
-                1.0 / temp_slider.value,
-                forgetful_c,
-                kappa_min,
-                kappa_max_pref,
-            );
-        } else {
-            console.log("Oops.");
-        }
+        kappa_min = kappa_min_input.value * SIZE * SIZE;
+        kappa_max_pref = 1.0;
+        tuner = Tuner.new(
+            field_slider.value,
+            target_m,
+            1.0 / temp_slider.value,
+            forgetful_c,
+            kappa_min,
+            kappa_max_pref,
+        );
     });
 
     temp_slider.addEventListener("input", event => {

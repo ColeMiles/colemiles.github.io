@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>2D Ising Model</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+  </head>
+  <body>
+    <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+    
+    <h1>Tuning the Ising model to arbitrary magnetization</h1>
+    <div id="explanation-div">
+    <p>
+      This page contains a demo for our new grand canonical ensemble Monte Carlo tuning algorithm, using the
+      two-dimensional <a href="https://en.wikipedia.org/wiki/Ising_model">Ising model</a> as a test case. The Ising model
+      is a simple theoretical model for <a href="https://en.wikipedia.org/wiki/Ferromagnetism">ferromagnetism</a>, the phenomena
+      where magnetic dipoles of a material will tend to align with each other, forming a permanent magnet.
+    </p>
+
+    <p>
+      At each site \(i\) of a lattice, we have a binary variable \(\sigma_i = \pm 1\) called a <em>spin</em>. The Hamiltonian
+      for the Ising model describing how energetically favorable different configurations \(\{\sigma_i\}\) of all of 
+      the spins are:
+      $$H = -J \sum_{\langle ij \rangle} \sigma_i \sigma_j - B \sum_{i} \sigma_i$$
+      where \(J, B\) are both real parameters giving the strength of the interaction between spins and the external magnetic
+      field, respectively.
+      Statistical mechanics tells us that if the system is coupled to a thermal bath at temperature \(T\), the equilibrium
+      distribution of the spin configurations is given by:
+      $$P(\{\sigma_i\}) = \exp\Big(H(\{\sigma_i\}) / k_B T\Big) / Z $$
+      with \(k_B\) being <a href="https://en.wikipedia.org/wiki/Boltzmann_constant">Boltzmann's constant</a> and
+      \(Z = \sum_{\{\sigma_i\}} \exp\Big(H\{\sigma_i\})/k_B T\Big)\) being the partition function (essentially a normalization
+      constant).
+    </p>
+    <p>
+      The goal is then as follows: Given a fixed value of \(J\), find the value of \(B = B^\ast\) such that the average magnetization
+      $$ \langle m \rangle = \sum_{\{\sigma_i\}} \left(\sum_{i} \sigma_i\right) \exp\Big(-H(\{\sigma_i\}) / k_B T\Big) / Z $$
+      is equal to some target value \(m^\ast\). This is difficult, because we don't have an analytic solution for the Ising model
+      probability distribution in nonzero field. An alternative/complement to analytic tools is <em>Monte Carlo simulation</em>,
+      which produces information about the distribution by producing a sequence of samples. In physics, the
+      dominant form of this approach is <a href="https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo">
+      Markov-chain Monte Carlo</a> (MCMC). An unfortunate drawback of MCMC is that sequential samples tend to
+      be highly correlated with each other -- it takes a considerable amount of time for the Markov chain to
+      "explore" the full distribution. If this is our only tool we can use to find \(B^\ast\), how can we do it?
+    </p>
+    <p>
+      The straightforward (but slow) type of approach would be to treat the simulation as a black-box, and use an off-the-shelf
+      black-box optimization algorithm. For any value of \(B\), we run the simulation for some long enough period of time
+      to estimate \(m(B)\), use the optimization algorithm to propose a new trial \(B\), and repeat until we have converged.
+      However, this is (1) slow, (2) throws away information from previous simualtions and (3) leaves precious information on the table.
+      Taking the derivative of \(\langle m\rangle\) with respect to \(B\) gives a fundamental result of statistical mechanics
+      that the <em>gradient</em> of an observable with respect to its coupling field (called the <em>susceptibility</em>, \(\chi\)) is
+      exactly proportional to the <em>fluctuations</em> of that observable at the current field:
+
+      $$ \chi \equiv \frac{\text{d}\langle m\rangle}{\text{d}B} = \frac{1}{k_B T} \left( \langle m^2 \rangle - \langle m \rangle^2 \right) $$
+
+      where the right hand side should be recognizable as a constant times the <em>variance </em> of \(m\).
+    </p>
+
+    <p>
+      With this, we propose an algorithm to <em>dynamically</em> tune the field during the course of a <em>single</em> Monte Carlo
+      simulation such that at sufficiently long times \(\langle m\rangle\) converges to \(m^\ast\). The idea behind the dynamic
+      tuning algorithm is very simple:
+      <ol>
+        <li> Maintain running averages \(\overline{B}_t, \overline{m}_t, \overline{\chi}_t^{\mathrm{fluc}}\) of all observables, averaging
+              over the previous <em>half</em> of the full simulation data. In particular, \(\overline{\chi}_t^{\mathrm{fluc}}\) is calculated
+              from the variance of \(m\) over that data. The idea here is that we would like to use an increasingly large
+              fraction of the simulation data to estimate all quantites, but samples from early-time dynamics should
+              eventually "fall off" our estimates due to being nonrepresentative of the current parameters.
+        </li>
+        <li>
+            To handle poor early-time statistics and bad estimates of \(\chi\) during nonequilibrium dynamics, we place
+            reasonable upper and lower bounds \(\overline{\chi}_t = \max[\chi_t^{\mathrm{min}}, \min(\chi_t^{\mathrm{max}}, \overline{\chi}_t^{\mathrm{fluc}})]\). We choose these bounds to be \(\chi_t^{\mathrm{min}} = \alpha / \sqrt{t+1}\)
+            for some constant \(\alpha\) proportional to the system size, and \(\chi_t^{\mathrm{max}} = \mathrm{Std}[m]/\mathrm{Std}[B]\).
+            For motivation behind these choices, see our paper.
+        </li>
+        <li>For the next timestep, set $$B_{t+1} = \overline{B}_t + (m^\ast - \overline{m}_t) / \overline{\chi}_t .$$
+
+          Repeat.
+        </li>
+      </ol>
+    </p>
+    <p>
+      For details on how this is actually implemented (in particular, how to achieve (1) in constant-time at each step), see the Rust source <a href="https://github.com/ColeMiles/colemiles.github.io">on Github</a>,
+      and for further results (including those on <em>quantum</em> Monte Carlo simulations) see our upcoming paper, <em>Dynamical tuning of the chemical potential to achieve a target particle number in grand canonical Monte Carlo simulations</em>, to be posted soon!
+    </p>
+
+    <p>
+      Below is a tool for playing around with our algorithm. The canvas shows the current spin configuration \(\{\sigma_i\}\), with red/blue pixels being \(\sigma_i = \pm 1\). Below the canvas are various sliders and menus to control both the system parameters and the tuning parameters. If the simulation is slow for you, either (1) pick a smaller system size or (2) refresh the page to clear the graph data.
+    </p>
+    </div>
+
+    <hr>
+
+
+    <!-- Main Ising Canvas -->
+    <div id="ising-canvas-div">
+      <canvas id="ising-canvas"></canvas>
+    </div>
+    <script src="./index.js" type="module"></script>
+
+    <!-- Buttons -->
+    <div id="button-wrapper">
+      <button id="toggle-button">Toggle Anim</button>
+      <button id="play-pause-button"></button>
+      <button id="reset-button">Randomize</button>
+      <button id="tune-button">Tune!</button>
+    </div>
+    
+    <!-- System parameter setting -->
+    <h3>System Params</h3>
+    <div id="system-params-wrapper">
+      <select name='Sys Size' id="sys-size">
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="250">250</option>
+        <option value="500" selected>500</option>
+      </select>
+      <label for="sys-size">Sys Size</label>
+      <input type="range" min="0.1" max="7.0" value="4.1" step="0.1" class="slider" id="temp-slider">
+      <label for="temp-slider" id="temp-slider-value"></label>
+      <input type="range" min="-2.0" max="2.0" value="0.0" step="0.01" class="slider" id="field-slider">
+      <label for="field-slider" id="field-slider-value"></label>
+      <label id="mag-value"></label>
+    </div>
+    <ul class="note-list">
+      <li> Changing the system size will re-randomize the configuration. </li>
+      <li> Tc ≈ 2.26918531421 </li>
+    </ul>
+
+    <!-- Tuner parameter setting -->
+    <h3>Tuner Params</h3>
+    <div id="tuner-params-wrapper">
+      <input type="number" min="-1.0" max="1.0" value="0.5" step="any" id="target-m-input">
+      <label for="target-m-input">Target \(m^\ast\)</label>
+      <input type="number" min="0.05" max="1.0" value="0.5" step="any" id="forgetful-c-input"></input>
+      <label for="forgetful-c-input">Running-average fraction</label>
+      <input type="number" id="kappa-min-input" min="0.0" value="1.0" step="any"></input>
+      <label for="kappa-min-input">\(\alpha\)</label>
+    </div>
+    <ul class="note-list">
+      <li>These will only go into effect once a new tuning run is started.</li>
+    </ul>
+
+    <!-- Graphs -->
+    <h3>Measurements</h3>
+    <!-- Graph Toggle Button -->
+    <button id="graph-toggle-button">Pause Plots</button>
+    <div id="graph-wrapper">
+      <div width="800" height="1200" id="mag-chart-div">
+        <canvas id="mag-chart"></canvas>
+        <label for="mag-chart" id="mag-chart-label"></label>
+        <label for="mean-mag-chart" id="mean-mag-chart-label"></label>
+      </div>
+      <div width="800" height="1200" id="field-chart-div">
+        <canvas id="field-chart"></canvas>
+        <label for="field-chart" id="field-chart-label"></label>
+        <label for="mean-field-chart" id="mean-field-chart-label"></label>
+      </div>
+      <div width="800" height="1200" id="kappa-chart-div">
+        <canvas id="kappa-chart"></canvas>
+        <label for="kappa-chart" id="kappa-chart-label"></label>
+        <label for="kappa-chart" id="kappa-max-chart-label"></label>
+      </div>
+    </div>
+    <ul class="note-list">
+      <li> These plots all show instantaneous values </li>
+      <li> The kappa plot shows the effective kappa, with both bounds applied</li>
+      <li> These plots show intensive quantities, but the tuner sees exclusively extensive quantities </li>
+    </ul>
+
+  </body>
+</html>
