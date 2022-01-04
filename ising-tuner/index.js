@@ -30,7 +30,6 @@ load().then((mod) => {
     const UP_COLOR_INT = 0xff0000;
     const DOWN_COLOR_INT = 0x0000ff;
 
-    // This is pretty gross ... any better solution?
     const UP_COLOR_R = (UP_COLOR_INT >> 16) & 0xff;
     const UP_COLOR_G = (UP_COLOR_INT >> 8) & 0xff;
     const UP_COLOR_B = UP_COLOR_INT & 0xff;
@@ -224,7 +223,7 @@ load().then((mod) => {
         labels: timesteps,
         datasets: [{
             data: kappa_data,
-            label: "Kappa",
+            label: "Chi",
             borderColor: "#48e283",
             pointRadius: 0.0,
             fill: false
@@ -245,7 +244,7 @@ load().then((mod) => {
                 type: 'linear',
                 scaleLabel: {
                     display: true,
-                    labelString: 'Kappa'
+                    labelString: 'Chi'
                 }
             }
         },
@@ -365,7 +364,6 @@ load().then((mod) => {
                 kappa_min,
                 kappa_max_pref,
             );
-            
         } else {
             tune_button.textContent = "Tune!"
         }
@@ -430,12 +428,6 @@ load().then((mod) => {
             const spins_ptr = grid.spins_ptr();
             const spins = new Int8Array(memory.buffer, spins_ptr, width * height);
 
-            const fliprows_ptr = grid.fliprows_ptr();
-            const flipcols_ptr = grid.flipcols_ptr();
-            const fliprows = new Uint32Array(memory.buffer, fliprows_ptr, num_flips);
-
-            const flipcols = new Uint32Array(memory.buffer, flipcols_ptr, num_flips);
-
             // Update data
             var mag = grid.magnetization();
             var field = grid.get_field()
@@ -448,6 +440,7 @@ load().then((mod) => {
                 // The tuner deals in the land of extensive quantities
                 var ext_mag = mag * (SIZE * SIZE);
                 var ext_mag_sq = ext_mag * ext_mag;
+                // This line alone is causing frozen pixels -- how??
                 var new_field = tuner.update(ext_mag, ext_mag_sq);
 
                 // Update the field slider
@@ -466,22 +459,25 @@ load().then((mod) => {
                 var mean_mag = tuner.mean_obs / (SIZE * SIZE);
                 mean_mag_chart_label.textContent = "{m} = " + toFixed(mean_mag, 2);
                 mean_field_chart_label.textContent = "{B} = " + toFixed(tuner.mean_field, 3);
-                kappa_chart_label.textContent = "κ = " + toFixed(kappa, 1);
-                kappa_max_chart_label.textContent = "κ_max = " + toFixed(kappa_max, 1);
+                kappa_chart_label.textContent = "χ = " + toFixed(kappa, 1);
+                kappa_max_chart_label.textContent = "χ_max = " + toFixed(kappa_max, 1);
             }
 
             // Update the animation of the configuration
-            // It would be nice if this was outside of this loops, but then
+            // It would be nice if this was outside of this loop, but then
             //   I need to store many fliprows/flipcols stacked, and I imagine
             //   that is slower.
             // Could make the Rust only clear fliprows/flipcols when explicitly
             //   told to rather than every call to many_steps
             if (show_animation) {
+                const fliprows_ptr = grid.fliprows_ptr();
+                const flipcols_ptr = grid.flipcols_ptr();
+                const fliprows = new Uint32Array(memory.buffer, fliprows_ptr, num_flips);
+                const flipcols = new Uint32Array(memory.buffer, flipcols_ptr, num_flips);
+            
                 for (let i = 0; i < num_flips; i++) {
                     const row = fliprows[i];
                     const col = flipcols[i];
-                    const spin_idx = getIndex(row, col);
-
                     flipSquare(row, col);
                 }
             }

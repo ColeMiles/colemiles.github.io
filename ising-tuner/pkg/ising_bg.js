@@ -38,6 +38,10 @@ function getStringFromWasm0(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
 }
 
+const u32CvtShim = new Uint32Array(2);
+
+const uint64CvtShim = new BigUint64Array(u32CvtShim.buffer);
+
 function addHeapObject(obj) {
     if (heap_next === heap.length) heap.push(heap.length + 1);
     const idx = heap_next;
@@ -60,6 +64,140 @@ function handleError(f) {
 
 function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
+}
+/**
+*/
+export class OldTuner {
+
+    static __wrap(ptr) {
+        const obj = Object.create(OldTuner.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        wasm.__wbg_oldtuner_free(ptr);
+    }
+    /**
+    * @returns {number}
+    */
+    get mean_obs() {
+        var ret = wasm.__wbg_get_oldtuner_mean_obs(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set mean_obs(arg0) {
+        wasm.__wbg_set_oldtuner_mean_obs(this.ptr, arg0);
+    }
+    /**
+    * @returns {number}
+    */
+    get mean_obs_sq() {
+        var ret = wasm.__wbg_get_oldtuner_mean_obs_sq(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set mean_obs_sq(arg0) {
+        wasm.__wbg_set_oldtuner_mean_obs_sq(this.ptr, arg0);
+    }
+    /**
+    * @returns {number}
+    */
+    get mean_field() {
+        var ret = wasm.__wbg_get_oldtuner_mean_field(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set mean_field(arg0) {
+        wasm.__wbg_set_oldtuner_mean_field(this.ptr, arg0);
+    }
+    /**
+    * @returns {number}
+    */
+    get var_mean_obs() {
+        var ret = wasm.__wbg_get_oldtuner_var_mean_obs(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set var_mean_obs(arg0) {
+        wasm.__wbg_set_oldtuner_var_mean_obs(this.ptr, arg0);
+    }
+    /**
+    * @returns {number}
+    */
+    get var_mean_field() {
+        var ret = wasm.__wbg_get_oldtuner_var_mean_field(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set var_mean_field(arg0) {
+        wasm.__wbg_set_oldtuner_var_mean_field(this.ptr, arg0);
+    }
+    /**
+    * @param {number} init_field
+    * @param {number} target_obs
+    * @param {number} beta
+    * @param {number} forgetful_c
+    * @param {number} kappa_min
+    * @param {number} kappa_max_pref
+    * @returns {OldTuner}
+    */
+    static new(init_field, target_obs, beta, forgetful_c, kappa_min, kappa_max_pref) {
+        var ret = wasm.oldtuner_new(init_field, target_obs, beta, forgetful_c, kappa_min, kappa_max_pref);
+        return OldTuner.__wrap(ret);
+    }
+    /**
+    * @param {number} obs
+    * @param {number} obs_sq
+    * @returns {number}
+    */
+    update(obs, obs_sq) {
+        var ret = wasm.oldtuner_update(this.ptr, obs, obs_sq);
+        return ret;
+    }
+    /**
+    * @returns {number}
+    */
+    get_kappa() {
+        var ret = wasm.oldtuner_get_kappa(this.ptr);
+        return ret;
+    }
+    /**
+    * @returns {number}
+    */
+    get_kappa_min() {
+        var ret = wasm.oldtuner_get_kappa_min(this.ptr);
+        return ret;
+    }
+    /**
+    * @returns {number}
+    */
+    get_kappa_max() {
+        var ret = wasm.oldtuner_get_kappa_max(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} init_field
+    * @param {number} target_obs
+    * @param {number} beta
+    */
+    reset(init_field, target_obs, beta) {
+        wasm.oldtuner_reset(this.ptr, init_field, target_obs, beta);
+    }
 }
 /**
 */
@@ -88,6 +226,22 @@ export class SpinGrid {
     */
     static new(width, height, interaction, temp, field) {
         var ret = wasm.spingrid_new(width, height, interaction, temp, field);
+        return SpinGrid.__wrap(ret);
+    }
+    /**
+    * @param {number} width
+    * @param {number} height
+    * @param {number} interaction
+    * @param {number} temp
+    * @param {number} field
+    * @param {BigInt} seed
+    * @returns {SpinGrid}
+    */
+    static new_with_seed(width, height, interaction, temp, field, seed) {
+        uint64CvtShim[0] = seed;
+        const low0 = u32CvtShim[0];
+        const high0 = u32CvtShim[1];
+        var ret = wasm.spingrid_new_with_seed(width, height, interaction, temp, field, low0, high0);
         return SpinGrid.__wrap(ret);
     }
     /**
@@ -153,17 +307,33 @@ export class SpinGrid {
         return ret;
     }
     /**
+    * @returns {number}
+    */
+    ext_magnetization() {
+        var ret = wasm.spingrid_ext_magnetization(this.ptr);
+        return ret;
+    }
+    /**
     */
     step() {
         wasm.spingrid_step(this.ptr);
     }
     /**
     * @param {number} steps
-    * @returns {number}
     */
     many_steps(steps) {
-        var ret = wasm.spingrid_many_steps(this.ptr, steps);
-        return ret >>> 0;
+        wasm.spingrid_many_steps(this.ptr, steps);
+    }
+    /**
+    * @param {number} p
+    */
+    randomize_p(p) {
+        wasm.spingrid_randomize_p(this.ptr, p);
+    }
+    /**
+    */
+    rand_sweep() {
+        wasm.spingrid_rand_sweep(this.ptr);
     }
     /**
     */
@@ -175,20 +345,6 @@ export class SpinGrid {
     */
     spins_ptr() {
         var ret = wasm.spingrid_spins_ptr(this.ptr);
-        return ret;
-    }
-    /**
-    * @returns {number}
-    */
-    fliprows_ptr() {
-        var ret = wasm.spingrid_fliprows_ptr(this.ptr);
-        return ret;
-    }
-    /**
-    * @returns {number}
-    */
-    flipcols_ptr() {
-        var ret = wasm.spingrid_flipcols_ptr(this.ptr);
         return ret;
     }
 }
@@ -213,40 +369,66 @@ export class Tuner {
     * @returns {number}
     */
     get mean_obs() {
-        var ret = wasm.__wbg_get_tuner_mean_obs(this.ptr);
+        var ret = wasm.__wbg_get_oldtuner_mean_obs(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
     set mean_obs(arg0) {
-        wasm.__wbg_set_tuner_mean_obs(this.ptr, arg0);
+        wasm.__wbg_set_oldtuner_mean_obs(this.ptr, arg0);
     }
     /**
     * @returns {number}
     */
     get mean_obs_sq() {
-        var ret = wasm.__wbg_get_tuner_mean_obs_sq(this.ptr);
+        var ret = wasm.__wbg_get_oldtuner_mean_obs_sq(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
     set mean_obs_sq(arg0) {
-        wasm.__wbg_set_tuner_mean_obs_sq(this.ptr, arg0);
+        wasm.__wbg_set_oldtuner_mean_obs_sq(this.ptr, arg0);
     }
     /**
     * @returns {number}
     */
     get mean_field() {
-        var ret = wasm.__wbg_get_tuner_mean_field(this.ptr);
+        var ret = wasm.__wbg_get_oldtuner_mean_field(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
     set mean_field(arg0) {
-        wasm.__wbg_set_tuner_mean_field(this.ptr, arg0);
+        wasm.__wbg_set_oldtuner_mean_field(this.ptr, arg0);
+    }
+    /**
+    * @returns {number}
+    */
+    get var_field() {
+        var ret = wasm.__wbg_get_tuner_var_field(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set var_field(arg0) {
+        wasm.__wbg_set_tuner_var_field(this.ptr, arg0);
+    }
+    /**
+    * @returns {number}
+    */
+    get var_obs() {
+        var ret = wasm.__wbg_get_oldtuner_var_mean_obs(this.ptr);
+        return ret;
+    }
+    /**
+    * @param {number} arg0
+    */
+    set var_obs(arg0) {
+        wasm.__wbg_set_oldtuner_var_mean_obs(this.ptr, arg0);
     }
     /**
     * @param {number} init_field
@@ -254,10 +436,11 @@ export class Tuner {
     * @param {number} beta
     * @param {number} forgetful_c
     * @param {number} kappa_min
+    * @param {number} kappa_max_pref
     * @returns {Tuner}
     */
-    static new(init_field, target_obs, beta, forgetful_c, kappa_min) {
-        var ret = wasm.tuner_new(init_field, target_obs, beta, forgetful_c, kappa_min);
+    static new(init_field, target_obs, beta, forgetful_c, kappa_min, kappa_max_pref) {
+        var ret = wasm.tuner_new(init_field, target_obs, beta, forgetful_c, kappa_min, kappa_max_pref);
         return Tuner.__wrap(ret);
     }
     /**
@@ -277,12 +460,18 @@ export class Tuner {
         return ret;
     }
     /**
-    * @param {number} init_field
-    * @param {number} target_obs
-    * @param {number} beta
+    * @returns {number}
     */
-    reset(init_field, target_obs, beta) {
-        wasm.tuner_reset(this.ptr, init_field, target_obs, beta);
+    get_kappa_min() {
+        var ret = wasm.tuner_get_kappa_min(this.ptr);
+        return ret;
+    }
+    /**
+    * @returns {number}
+    */
+    get_kappa_max() {
+        var ret = wasm.tuner_get_kappa_max(this.ptr);
+        return ret;
     }
 }
 

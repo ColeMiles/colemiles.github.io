@@ -37,6 +37,10 @@ function getStringFromWasm0(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
 }
 
+const u32CvtShim = new Uint32Array(2);
+
+const uint64CvtShim = new BigUint64Array(u32CvtShim.buffer);
+
 function addHeapObject(obj) {
     if (heap_next === heap.length) heap.push(heap.length + 1);
     const idx = heap_next;
@@ -60,7 +64,6 @@ function handleError(f) {
 function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
-
 /**
 */
 export class SpinGrid {
@@ -88,6 +91,22 @@ export class SpinGrid {
     */
     static new(width, height, interaction, temp, field) {
         var ret = wasm.spingrid_new(width, height, interaction, temp, field);
+        return SpinGrid.__wrap(ret);
+    }
+    /**
+    * @param {number} width
+    * @param {number} height
+    * @param {number} interaction
+    * @param {number} temp
+    * @param {number} field
+    * @param {BigInt} seed
+    * @returns {SpinGrid}
+    */
+    static new_with_seed(width, height, interaction, temp, field, seed) {
+        uint64CvtShim[0] = seed;
+        const low0 = u32CvtShim[0];
+        const high0 = u32CvtShim[1];
+        var ret = wasm.spingrid_new_with_seed(width, height, interaction, temp, field, low0, high0);
         return SpinGrid.__wrap(ret);
     }
     /**
@@ -153,6 +172,13 @@ export class SpinGrid {
         return ret;
     }
     /**
+    * @returns {number}
+    */
+    ext_magnetization() {
+        var ret = wasm.spingrid_ext_magnetization(this.ptr);
+        return ret;
+    }
+    /**
     */
     step() {
         wasm.spingrid_step(this.ptr);
@@ -164,6 +190,17 @@ export class SpinGrid {
     many_steps(steps) {
         var ret = wasm.spingrid_many_steps(this.ptr, steps);
         return ret >>> 0;
+    }
+    /**
+    * @param {number} p
+    */
+    randomize_p(p) {
+        wasm.spingrid_randomize_p(this.ptr, p);
+    }
+    /**
+    */
+    rand_sweep() {
+        wasm.spingrid_rand_sweep(this.ptr);
     }
     /**
     */
@@ -213,40 +250,40 @@ export class Tuner {
     * @returns {number}
     */
     get mean_obs() {
-        var ret = wasm.__wbg_get_oldtuner_mean_obs(this.ptr);
+        var ret = wasm.__wbg_get_tuner_mean_obs(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
     set mean_obs(arg0) {
-        wasm.__wbg_set_oldtuner_mean_obs(this.ptr, arg0);
+        wasm.__wbg_set_tuner_mean_obs(this.ptr, arg0);
     }
     /**
     * @returns {number}
     */
     get mean_obs_sq() {
-        var ret = wasm.__wbg_get_oldtuner_mean_obs_sq(this.ptr);
+        var ret = wasm.__wbg_get_tuner_mean_obs_sq(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
     set mean_obs_sq(arg0) {
-        wasm.__wbg_set_oldtuner_mean_obs_sq(this.ptr, arg0);
+        wasm.__wbg_set_tuner_mean_obs_sq(this.ptr, arg0);
     }
     /**
     * @returns {number}
     */
     get mean_field() {
-        var ret = wasm.__wbg_get_oldtuner_mean_field(this.ptr);
+        var ret = wasm.__wbg_get_tuner_mean_field(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
     set mean_field(arg0) {
-        wasm.__wbg_set_oldtuner_mean_field(this.ptr, arg0);
+        wasm.__wbg_set_tuner_mean_field(this.ptr, arg0);
     }
     /**
     * @returns {number}
@@ -265,14 +302,14 @@ export class Tuner {
     * @returns {number}
     */
     get var_obs() {
-        var ret = wasm.__wbg_get_oldtuner_var_mean_obs(this.ptr);
+        var ret = wasm.__wbg_get_tuner_var_obs(this.ptr);
         return ret;
     }
     /**
     * @param {number} arg0
     */
     set var_obs(arg0) {
-        wasm.__wbg_set_oldtuner_var_mean_obs(this.ptr, arg0);
+        wasm.__wbg_set_tuner_var_obs(this.ptr, arg0);
     }
     /**
     * @param {number} init_field

@@ -51,7 +51,7 @@
       The straightforward (but slow) type of approach would be to treat the simulation as a black-box, and use an off-the-shelf
       black-box optimization algorithm. For any value of \(B\), we run the simulation for some long enough period of time
       to estimate \(m(B)\), use the optimization algorithm to propose a new trial \(B\), and repeat until we have converged.
-      However, this is (1) slow, (2) throws away information from previous simualtions and (3) leaves precious information on the table.
+      However, this is (1) slow, (2) throws away information from previous simulations and (3) leaves precious information on the table.
       Taking the derivative of \(\langle m\rangle\) with respect to \(B\) gives a fundamental result of statistical mechanics
       that the <em>gradient</em> of an observable with respect to its coupling field (called the <em>susceptibility</em>, \(\chi\)) is
       exactly proportional to the <em>fluctuations</em> of that observable at the current field:
@@ -62,7 +62,7 @@
     </p>
 
     <p>
-      With this, we propose an algorithm to <em>dynamically</em> tune the field during the course of a <em>single</em> Monte Carlo
+      With this in hand, we propose an algorithm to <em>dynamically</em> tune the field during the course of a <em>single</em> Monte Carlo
       simulation such that at sufficiently long times \(\langle m\rangle\) converges to \(m^\ast\). The idea behind the dynamic
       tuning algorithm is very simple:
       <ol>
@@ -90,7 +90,7 @@
     </p>
 
     <p>
-      Below is a tool for playing around with our algorithm. The canvas shows the current spin configuration \(\{\sigma_i\}\), with red/blue pixels being \(\sigma_i = \pm 1\). Below the canvas are various sliders and menus to control both the system parameters and the tuning parameters. If the simulation is slow for you, either (1) pick a smaller system size or (2) refresh the page to clear the graph data.
+      Below is a tool for playing around with our algorithm. The canvas shows the current spin configuration \(\{\sigma_i\}\), with red/blue pixels being \(\sigma_i = \pm 1\). Below the canvas are various sliders and menus to control both the system parameters and the tuning parameters. If the simulation is slow for you, either (1) pick a smaller system size, (2) hit the "Pause Plots" button to stop the plots from updating, or (3) refresh the page to clear the graph data.
     </p>
     </div>
 
@@ -129,7 +129,7 @@
     </div>
     <ul class="note-list">
       <li> Changing the system size will re-randomize the configuration. </li>
-      <li> Tc ≈ 2.26918531421 </li>
+      <li> \(T_c \approx 2.26918531421\) -- tuning is impossible below this </li>
     </ul>
 
     <!-- Tuner parameter setting -->
@@ -168,8 +168,8 @@
       </div>
     </div>
     <ul class="note-list">
-      <li> These plots all show instantaneous values </li>
-      <li> The kappa plot shows the effective kappa, with both bounds applied</li>
+      <li> These plots all show instantaneous values, with bracketed labels being running means. </li>
+      <li> The Chi plot shows \(\chi^{\mathrm{eff}}\), having both lower and upper bounds applied</li>
       <li> These plots show intensive quantities, but the tuner sees exclusively extensive quantities </li>
     </ul>
 

@@ -1,0 +1,12 @@
+[package]
+name = "ising"
+version = "0.1.0"
+authors = ["Cole Miles <cmm572@cornell.edu>"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+rand = {version = "0.7.2", features = ["wasm-bindgen", "small_rng"]}
+wasm-bindgen = "0.2"
+itertools = "0.10.0"
